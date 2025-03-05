@@ -26,13 +26,13 @@ export function createTaxRange(args?: {
 export type CalculatedRange = {
   id: string;
 
-  baseAmount: number;
-  taxableAmount: number;
+  baseYearlyIncome: number;
+  taxableYearlyIncome: number;
 
   taxPercentage: number;
   taxMinThreshold: number;
 
-  taxAmount: number;
+  taxYearlyAmount: number;
   remainingAmount: number;
 };
 

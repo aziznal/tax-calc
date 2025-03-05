@@ -1,44 +1,52 @@
 import { createRandomId } from "./random-id";
-import { CalculatedRanges, TaxRange, TaxRanges } from "./tax-range";
+import {
+  CalculatedRange,
+  CalculatedRanges,
+  TaxRange,
+  TaxRanges,
+} from "./tax-range";
 
 export function calcTax(args: {
   ranges: TaxRanges;
-  baseAmount: number;
+  baseYearlyIncome: number;
+  taxableRate: number;
 }): CalculatedRanges {
+  const taxableIncome = (args.taxableRate / 100) * args.baseYearlyIncome;
+
   return (
     args.ranges.filter(
       (range) =>
         range.minThreshold !== undefined && range.taxPercentage !== undefined,
     ) as Required<TaxRange>[]
   )
-    .filter((range) => range.minThreshold < args.baseAmount)
+    .filter((range) => range.minThreshold < taxableIncome)
     .map((range, i, all) => {
       const nextRange = all[i + 1];
 
-      const taxableAmount = getTaxableAmount({
-        baseAmount: args.baseAmount,
+      const taxableYearlyIncome = getTaxableAmount({
+        baseIncome: taxableIncome,
         minThreshold: range.minThreshold,
         nextThreshold: nextRange?.minThreshold,
       });
 
-      const taxAmount = calcTaxAmount({
-        taxableAmount,
+      const taxYearlyAmount = calcTaxAmount({
+        taxableAmount: taxableYearlyIncome,
         taxPercentage: range.taxPercentage,
       });
 
       return {
         id: createRandomId(),
 
-        baseAmount: args.baseAmount,
-        taxableAmount,
+        baseYearlyIncome: args.baseYearlyIncome,
+        taxableYearlyIncome,
 
         taxPercentage: range.taxPercentage,
         taxMinThreshold: range.minThreshold,
 
-        taxAmount,
+        taxYearlyAmount,
 
-        remainingAmount: taxableAmount - taxAmount,
-      };
+        remainingAmount: taxableYearlyIncome - taxYearlyAmount,
+      } satisfies CalculatedRange;
     });
 }
 
@@ -47,13 +55,13 @@ function calcTaxAmount(args: { taxPercentage: number; taxableAmount: number }) {
 }
 
 function getTaxableAmount(args: {
-  baseAmount: number;
+  baseIncome: number;
   minThreshold: number;
   nextThreshold?: number;
 }): number {
   if (args.nextThreshold) {
     return args.nextThreshold - args.minThreshold;
   } else {
-    return args.baseAmount - args.minThreshold;
+    return args.baseIncome - args.minThreshold;
   }
 }

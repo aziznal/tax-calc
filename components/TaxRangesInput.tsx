@@ -1,18 +1,16 @@
 import { Input } from "./ui/input";
-import { AnimatePresence, motion } from "motion/react";
-import { LucideExternalLink, LucideTrash } from "lucide-react";
+import { LucideExternalLink, LucideRotateCw, LucideTrash } from "lucide-react";
 import { createTaxRange, TaxRange, TaxRanges } from "@/lib/tax-range";
 import Link from "next/link";
+import { Button } from "./ui/button";
+import { useAppState } from "@/lib/state";
 
-type TaxRangesInputProps = {
-  ranges: TaxRanges;
-  onRangesChanged: (value: TaxRanges) => void;
-};
+export function TaxRangesInput() {
+  const { ranges, setRanges } = useAppState();
 
-export function TaxRangesInput(props: TaxRangesInputProps) {
   const update = (args: { range: TaxRange; index: number }) => {
-    props.onRangesChanged(
-      props.ranges.map((range, i) => {
+    setRanges(
+      ranges.map((range, i) => {
         if (i === args.index) {
           return args.range;
         }
@@ -23,22 +21,29 @@ export function TaxRangesInput(props: TaxRangesInputProps) {
   };
 
   const addNewRange = () => {
-    props.onRangesChanged([...props.ranges, createTaxRange()]);
+    setRanges([...ranges, createTaxRange()]);
   };
 
   const removeRange = (id: string) => {
-    props.onRangesChanged(props.ranges.filter((range) => range.id !== id));
+    setRanges(ranges.filter((range) => range.id !== id));
+  };
+
+  const reset = () => {
+    const hasConfirmed = confirm("Confirm reset: This action cannot be done.");
+
+    if (!hasConfirmed) return;
+
+    setRanges([]);
   };
 
   return (
-    <motion.div>
-      <AnimatePresence mode="wait">
-        {props.ranges.length > 0 && (
-          <motion.ul className="mb-7 flex flex-col gap-3">
-            {props.ranges.map((range, i) => (
-              <motion.li
-                key={range.id}
-                layout
+    <div className="flex flex-col items-center gap-12 py-6">
+      <section className="flex flex-col gap-4">
+        {ranges.length > 0 && (
+          <ul className="flex flex-col gap-3">
+            {ranges.map((range, i) => (
+              <li
+                key={"range-input-" + range.id}
                 className="flex gap-1 items-center"
               >
                 <div className="flex gap-3">
@@ -76,27 +81,37 @@ export function TaxRangesInput(props: TaxRangesInputProps) {
                   className="w-fit h-fit p-2 block shrink-0 cursor-pointer hover:bg-neutral-900 rounded-full transition-colors text-neutral-700"
                   size="18"
                 />
-              </motion.li>
+              </li>
             ))}
-          </motion.ul>
+          </ul>
         )}
-      </AnimatePresence>
 
-      <div
-        onClick={addNewRange}
-        className="border rounded-md p-2 px-4 w-fit mx-auto text-sm text-neutral-500 hover:border-blue-800 transition-colors hover:bg-neutral-900 cursor-pointer mb-6"
-      >
-        Add New Range +
-      </div>
+        <div
+          onClick={addNewRange}
+          className="border rounded-md p-2 px-4 w-fit mx-auto text-sm text-neutral-500 hover:border-blue-800 transition-colors hover:bg-neutral-900 cursor-pointer"
+        >
+          Add New Range +
+        </div>
+      </section>
 
-      {props.ranges.length === 0 && (
-        <div className="mb-5">
-          <p className="mb-2 text-sm text-neutral-400">Or use a template</p>
+      {ranges.length === 0 && (
+        <div>
+          <p className="mb-3 text-sm text-neutral-400">Or use a template</p>
 
-          <TurkiyeRangeTemplate onSelect={props.onRangesChanged} />
+          <TurkiyeRangeTemplate onSelect={setRanges} />
         </div>
       )}
-    </motion.div>
+
+      {ranges.length > 0 && (
+        <Button
+          variant="outline"
+          className="text-muted-foreground"
+          onClick={reset}
+        >
+          Reset <LucideRotateCw />
+        </Button>
+      )}
+    </div>
   );
 }
 
@@ -107,7 +122,7 @@ const RangeTemplate: React.FC<{
 }> = (props) => {
   return (
     <div
-      className="p-2 rounded border text-sm font-bold border-rose-900 hover:border-rose-700 cursor-pointer transition-all hover:bg-neutral-800"
+      className="p-2 px-4 rounded border text-sm font-bold border-rose-900 hover:border-rose-700 cursor-pointer transition-all hover:bg-neutral-800"
       onClick={() => props.onSelect(props.ranges)}
     >
       {props.name}
@@ -119,7 +134,7 @@ const TurkiyeRangeTemplate: React.FC<{
   onSelect: (value: TaxRanges) => void;
 }> = (props) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col items-center gap-1">
       <RangeTemplate
         onSelect={props.onSelect}
         name="Türkiye 2025"
