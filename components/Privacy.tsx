@@ -22,7 +22,7 @@ export const PrivacyToggle: React.FC = () => {
       {!isPrivacyActive && <PrivacyButton className="absolute top-4 right-4" />}
 
       {isPrivacyActive && (
-        <div className="fixed inset-0 top-24 z-100 backdrop-blur flex items-center justify-center text-2xl flex-col gap-4 text-center container text-balance">
+        <div className="fixed top-0 left-0 h-dvh w-dvw z-100 backdrop-blur flex items-center justify-center text-2xl flex-col gap-4 text-center text-balance px-4">
           <div>Privacy mode is active. Disable it to continue.</div>
 
           <PrivacyButton className="text-amber-400 border bg-amber-900" />
