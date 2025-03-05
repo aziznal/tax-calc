@@ -16,7 +16,7 @@ export default function Home() {
   const [baseAmount, setBaseAmount] = useState<number>();
 
   return (
-    <div className="flex flex-col justify-center items-center text-center py-64 min-h-dvh container mx-auto">
+    <div className="flex flex-col justify-center items-center text-center py-64 min-h-dvh px-2 sm:px-0 container mx-auto">
       <h1 className="font-black text-4xl mb-3">Tax Calculator</h1>
 
       <p className="mb-6">
@@ -28,7 +28,7 @@ export default function Home() {
           value={baseAmount}
           onChange={(e) => setBaseAmount(+e.target.value)}
           placeholder={placeholder}
-          className="h-[50px] !text-lg"
+          className="h-[50px] text-lg"
         />
       </div>
 
